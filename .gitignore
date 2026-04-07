@@ -1,0 +1,5 @@
+# Local datasets and databases
+/data/montcoalert/
+*.db
+*.sqlite
+*.sqlite3
