@@ -277,20 +277,85 @@ def wsdl_description() -> Response:
     """Отдает статическое WSDL-описание доступных операций сервиса."""
     wsdl = """<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <definitions name=\"CallsService\"
-             targetNamespace=\"http://localhost:5000/calls\"
-             xmlns:tns=\"http://localhost:5000/calls\"
-             xmlns=\"http://schemas.xmlsoap.org/wsdl/\">
-  <service name=\"CallsService\">
-	<documentation>REST API для сущности calls из LR2.</documentation>
-  </service>
-  <portType name=\"CallsPortType\">
-	<operation name=\"listCalls\" />
-	<operation name=\"getCall\" />
-	<operation name=\"createCall\" />
-	<operation name=\"updateCall\" />
-	<operation name=\"deleteCall\" />
-	<operation name=\"statsByHour\" />
-  </portType>
+                         targetNamespace=\"http://localhost:5000/wsdl/calls\"
+                         xmlns:tns=\"http://localhost:5000/wsdl/calls\"
+                         xmlns:http=\"http://schemas.xmlsoap.org/wsdl/http/\"
+                         xmlns=\"http://schemas.xmlsoap.org/wsdl/\">
+    <documentation>
+        Краткое описание REST API для calls. По умолчанию ответ JSON,
+        при format=wsdl возвращается XML.
+    </documentation>
+
+    <portType name=\"CallsPortType\">
+        <operation name=\"ListCalls\">
+            <documentation>GET /api/calls?page=&amp;per_page=&amp;format=wsdl</documentation>
+        </operation>
+        <operation name=\"GetCall\">
+            <documentation>GET /api/calls/{call_id}?format=wsdl</documentation>
+        </operation>
+        <operation name=\"CreateCall\">
+            <documentation>POST /api/calls?format=wsdl</documentation>
+        </operation>
+        <operation name=\"UpdateCall\">
+            <documentation>PUT /api/calls/{call_id}?format=wsdl</documentation>
+        </operation>
+        <operation name=\"DeleteCall\">
+            <documentation>DELETE /api/calls/{call_id}?format=wsdl</documentation>
+        </operation>
+        <operation name=\"StatsByHour\">
+            <documentation>GET /api/stats/hour/{hour}?format=wsdl</documentation>
+        </operation>
+    </portType>
+
+    <binding name=\"CallsHttpGetBinding\" type=\"tns:CallsPortType\">
+        <http:binding verb=\"GET\" />
+        <operation name=\"ListCalls\">
+            <http:operation location=\"/api/calls\" />
+        </operation>
+        <operation name=\"GetCall\">
+            <http:operation location=\"/api/calls/{call_id}\" />
+        </operation>
+        <operation name=\"StatsByHour\">
+            <http:operation location=\"/api/stats/hour/{hour}\" />
+        </operation>
+    </binding>
+
+    <binding name=\"CallsHttpPostBinding\" type=\"tns:CallsPortType\">
+        <http:binding verb=\"POST\" />
+        <operation name=\"CreateCall\">
+            <http:operation location=\"/api/calls\" />
+        </operation>
+    </binding>
+
+    <binding name=\"CallsHttpPutBinding\" type=\"tns:CallsPortType\">
+        <http:binding verb=\"PUT\" />
+        <operation name=\"UpdateCall\">
+            <http:operation location=\"/api/calls/{call_id}\" />
+        </operation>
+    </binding>
+
+    <binding name=\"CallsHttpDeleteBinding\" type=\"tns:CallsPortType\">
+        <http:binding verb=\"DELETE\" />
+        <operation name=\"DeleteCall\">
+            <http:operation location=\"/api/calls/{call_id}\" />
+        </operation>
+    </binding>
+
+    <service name=\"CallsService\">
+        <documentation>REST API для сущности calls из LR2.</documentation>
+        <port name=\"CallsGetPort\" binding=\"tns:CallsHttpGetBinding\">
+            <http:address location=\"http://localhost:5000\" />
+        </port>
+        <port name=\"CallsPostPort\" binding=\"tns:CallsHttpPostBinding\">
+            <http:address location=\"http://localhost:5000\" />
+        </port>
+        <port name=\"CallsPutPort\" binding=\"tns:CallsHttpPutBinding\">
+            <http:address location=\"http://localhost:5000\" />
+        </port>
+        <port name=\"CallsDeletePort\" binding=\"tns:CallsHttpDeleteBinding\">
+            <http:address location=\"http://localhost:5000\" />
+        </port>
+    </service>
 </definitions>
 """
     return Response(wsdl, mimetype="application/wsdl+xml")
